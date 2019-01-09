@@ -22,14 +22,12 @@ void processRullUpdate() {
 void findFirstTemperature() {
   needTemperature = temperature;
   if (millisecondFromStartFullCalibration > timeCalibrationOfTemperature){
-    setDefaultMassiveTemperature(lastTemperature);
-    state = 3;
-    makeColorMenu();
+    stateWork();
   }
 }
 
 void testTemperature() {
-  howPowerfullWorkFreezer = 500 * (1 - (1/calibrationDifferenceTemperature) * (needTemperature - temperature));
+  howPowerfullWorkFreezer = 500 * (1 - (1 / calibrationDifferenceTemperature) * (needTemperature - temperature));
   if (abs(needTemperature - temperature) > calibrationDifferenceTemperature){
     stateMainMenu();
     calibrationIsDone = "DONE";
@@ -41,8 +39,10 @@ void pauseWork() {
   howPowerfullWorkHeater = 0;
 }
 
+
 void minusTemperature() {
-  if (abs(targetTemperature - needTemperature) >= 0.1) {
+  if ((abs(targetTemperature - needTemperature) >= 0.1)
+    /*&& (needTemperature + 6 > lastTemperature)*/) {
     needTemperature += 
       speedTemperature 
         * (((thisTimeSecond + 60) - lastTimeSecond) % 60)
@@ -50,10 +50,13 @@ void minusTemperature() {
         * ((targetTemperature - needTemperature) / abs(targetTemperature - needTemperature));
   }
 }
+
+
 void controlSourcePower() {
-  //powerSource = (temperature - needTemperature);
-  powerSource = (speedTemperature - speedTemperatureBig);
+  powerSource = (temperature - needTemperature);
 }
+
+
 void stateRelay() {
   if (powerSource > 0) {
     howPowerfullWorkFreezer = abs(powerSource) * coefSourceFreez;
@@ -63,4 +66,22 @@ void stateRelay() {
     howPowerfullWorkFreezer = 0;
     howPowerfullWorkHeater = abs(powerSource) * coefSourceFreez;
   }
+}
+
+
+
+
+
+void styles(){
+  
+}
+
+void styleSIMPLE(){
+  
+}
+void styleWITHslowPART(){
+   
+}
+void stylePROGRESSIVE(){
+  
 }

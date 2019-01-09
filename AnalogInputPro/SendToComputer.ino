@@ -40,10 +40,10 @@ void coefSourceChanger(){
     + " FreezPow: " + (String)(powerSource)
     + " FreezPer: " + (String)(howPowerfullWorkFreezer)
     + " SpeedTemperature: " + (String)speedTemperature
-    + " Big: " +(String)speedTemperatureBig
-    + " Small: " +(String)speedTemperatureSmall
+    //+ "       //"
     //+ " X:" + analogRead(VRX)
     //+ " Y:"+ analogRead(VRY)
+    + "Button (" + lastLongTouchKey + ")(" + lastKey +")";
     ;
 }
 

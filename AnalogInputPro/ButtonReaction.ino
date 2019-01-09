@@ -139,24 +139,24 @@ void buttonC() {
     howPowerfullWorkFreezer = 0;
 }
 void buttonD() { // DeveloperMenu
+  
+  if (state == 4) stateMainMenu();
   makeNotDeveloperMenu();
-  stateMainMenu();
 }
 
 
 void catchDevMenu(){ // Перевырка чи залогынено для меню розробника
-  lastSymbols();
   checkSymbols();
 }
-void lastSymbols(){ // Запис останнього символа в стек
-  if (keyMass[0] == lastLongTouchKey)
-    return;
-  for (i = symbols - 1; i > 0; i--) {
-    keyMass[i] = keyMass[i-1];
-  }
-  keyMass[0] = lastLongTouchKey;
-}
 void checkSymbols(){ // Перевырка чи сходиться пароль
+  for (i = 0 ; i < symbols; i++ ){
+    if (keyPaswordSIMPLE[i] != keyMass[i])
+     way = SIMPLE;
+  }
+  for (i = 0 ; i < symbols; i++ ){
+    if (keyPaswordWITHslowPART[i] != keyMass[i])
+     way = WITHslowPART;
+  }
   for (i = 0 ; i < symbols; i++ ){
     if (keyPasword[i] != keyMass[i])
      return;
@@ -180,16 +180,17 @@ void workOrPause(){
 
 void makeDeveloperMenu() {
   isDeveloperMenu = true;
+  myGLCD.setFont(SmallFont);
   makeColorMenu();
 }
 void makeNotDeveloperMenu() {
   isDeveloperMenu = false;
+  myGLCD.setFont(BigFont);
   makeColorMenu();
 }
 
 void stateMainMenu(){
-  if (state == 4)   
-    state = 0;
+  state = 0;
   makeColorMenu();
 }
 void stateWork(){

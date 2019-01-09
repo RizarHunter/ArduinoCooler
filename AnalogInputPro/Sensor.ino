@@ -1,28 +1,20 @@
 void sensorSetup() {
   pinMode(THERMISTORPIN, INPUT);
   firstMoment();
-  setDefaultMassiveTemperature(defaultTemperatureFromStart);
 }
 void sensorUpdate() {
   if (millisecondFromStartFullCalibration < 40) firstMoment(); // Write all massive, if first moment
-  if (abs(millisecond - millisecondSensor) > 20) {
+  if (abs(millisecond - millisecondSensor) > 20) { 
     getData();
     sensorTimeUpdate();
   }
   calculateAverage();
   calculateTemperature();
-
-  temperatureMassiveAndSpeed();
 }
 
 void firstMoment() {
   for (i = 0; i < periodMiddle; i++) {
     samples[i] = analogRead(THERMISTORPIN);
-  }
-}
-void setDefaultMassiveTemperature(float defaultTemperatureFromStart){
-  for (i = 0; i < numberOfSecondForTemperature; i++) {
-    tempertatureForEverySecond[i] = defaultTemperatureFromStart;
   }
 }
 
@@ -32,7 +24,7 @@ void getData() {
   }
   samples[periodMiddle - 1] = analogRead(THERMISTORPIN);
 }
-void sensorTimeUpdate() {
+void sensorTimeUpdate(){
   millisecondSensor = millisecond;
 }
 
@@ -48,48 +40,9 @@ void calculateAverage() {
 }
 
 void calculateTemperature() {
-  lastTemperature = temperature; \
-  temperature = (average - 100) * 2.5f;
+  lastTemperature = temperature;
+  //temperature = (average - 102.6f) * 2.5f;
+  temperature = (average - 102) * 2.45f;
   //temperature = (average - 19) * 2.56f - 196;
   temperature = (temperature + lastTemperature) / 2;
-}
-
-
-
-void temperatureMassiveAndSpeed(){
-  saveTemperature();
-  updateSpeedOfTemperature();
-}
-
-void saveTemperature() {
-  if ((second + 60 - commonTimeLastMesuare) % 60 > 0) {
-    saveTemperatureInMassive();
-    commonTimeLastMesuare = second;
-  }
-}
-void saveTemperatureInMassive() {
-  for (i = numberOfSecondForTemperature - 1; i > 0; i--) {
-    tempertatureForEverySecond[i] = tempertatureForEverySecond[i - 1];
-  }
-  tempertatureForEverySecond[0] = lastTemperature;
-}
-void updateSpeedOfTemperature(){
-  int howManyNumbers = 5; // amount for averaging
-  
-  float firstNumber = tempertatureForEverySecond[0];
-  for (i = 1; i < howManyNumbers; i++){ firstNumber += tempertatureForEverySecond[i]; }
-  if (howManyNumbers > 0) firstNumber /= howManyNumbers;
-  
-  float lastSmallNumber = tempertatureForEverySecond[numberOfSecondForTemperatureSmall - 1];
-  for (i = numberOfSecondForTemperatureSmall - howManyNumbers; i < numberOfSecondForTemperatureSmall - 1; i++){ lastSmallNumber += tempertatureForEverySecond[i]; }
-  if (howManyNumbers > 0) lastSmallNumber /= howManyNumbers;
-  
-  float lastBigNumber = tempertatureForEverySecond[numberOfSecondForTemperature - 1];
-  for (i = numberOfSecondForTemperature - howManyNumbers; i < numberOfSecondForTemperature - 1; i++){ lastBigNumber += tempertatureForEverySecond[i]; }
-  if (howManyNumbers > 0) lastBigNumber /= howManyNumbers;
-  
-  speedTemperatureSmall = (lastSmallNumber - firstNumber)
-   / (numberOfSecondForTemperatureSmall - 1) * 60;
-  speedTemperatureBig = (lastBigNumber - firstNumber)
-   / (numberOfSecondForTemperature-1) * 60;
 }

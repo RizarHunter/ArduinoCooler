@@ -11,6 +11,7 @@ void timeUpdate() {
 void getMillis(){
   millisecondCommon = millis();
 }
+
 void findTime(){
   millisecondLast = millisecond;
   millisecond = millisecondCommon % thousand;
@@ -18,9 +19,11 @@ void findTime(){
   minute = millisecondCommon / thousand / 60 % 60;
   hour = millisecondCommon / thousand / 60 / 60;
 }
+
 void timeAfterCalibration(){
   millisecondFromStartFullCalibration = millisecondCommon - millisecondOfNewCalibration;
 }
+
 
 void startNewTimeCalibration(){
   millisecondOfNewCalibration = millisecondCommon;

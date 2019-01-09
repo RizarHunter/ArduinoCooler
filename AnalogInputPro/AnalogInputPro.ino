@@ -1,17 +1,23 @@
 #include <Keypad.h>
 #include <memorysaver.h>
 #include <UTFT.h>
-#include <SPI.h>
-#include <Wire.h>
+//#include <SPI.h>
+//#include <Wire.h>
 
+enum Way{
+  SIMPLE, 
+  WITHslowPART, 
+  PROGRESSIVE, 
+};
 
+int way = PROGRESSIVE;
 
 //Common///////////////
 
 int state = -1; // -1 - Юзтування температури, 0 - MainMenu, 1 - Юзтування, 2 - Пауза, 3 - Нормальна робота, 4 - SpecialWork
 bool isCalibration = true; // Якшо true то юзтування, якщо false то нормальна робота
 bool isWork = false; // Чи працюэ, чи пауза, true - work, false - pause
-bool isDeveloperMenu = false; // Запуск меню выдладки для розробникыв
+bool isDeveloperMenu = true;//false; // Запуск меню выдладки для розробникыв
 
 #define timeRequest 1 // Час одного цикла
 int i; // Лічильник циклів for
@@ -49,23 +55,18 @@ int millisecondFromStartFullCalibration; // момент останнього з
 
 // Sensor
 #define THERMISTORPIN A0 // Датчик температури
-#define SERIESRESISTOR 300 // емкость второго резистора в цепи
+#define SERIESRESISTOR 304 // емкость второго резистора в цепи
 #define periodMiddle 100 // Усереднювати за скільки циклів
 float samples[periodMiddle]; // Масив для усереднення
 float average; // Середнє значення
 float lastTemperature; // Минула температура
 bool firstTime = true; // Перший запис
-
-const int numberOfSecondForTemperature = 180; // size of massive
-int numberOfSecondForTemperatureSmall = 16; // time for small period
-float tempertatureForEverySecond[numberOfSecondForTemperature]; // temperature data
-float defaultTemperatureFromStart = 9999; // temperature all massive for first moment
-int commonTimeLastMesuare = 0; // for saving last time to copy
-float speedTemperatureSmall = 0;
-float speedTemperatureBig = 0;
+//int numberOfSecondForTemperature = 150;
+//int numberOfSecondForTemperatureSmall = 15;
+//float tempertatureForEverySecond[numberOfSecondForTemperature];
 
 // Джойстік
-#define SW   7  // Пин для кнопки
+#define SW   14  // Пин для кнопки
 #define VRX  A6 // Пин для оси Х
 #define VRY  A7 // Пин для оси Y
 bool pushThis = false; // Поточний стан нажаття
@@ -82,9 +83,13 @@ char keys[ROWS][COLS] = {
   {'7','8','9','C'},
   {'*','0','#','D'}
 };
-byte rowPins[ROWS] = {36,34, 32, 30}; 
-byte colPins[COLS] = {28, 26, 24, 22}; 
-Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+byte rowPins[ROWS] = 
+  {2, 3, 4, 5};
+  //{36,34, 32, 30}; 
+byte colPins[COLS] = 
+  {6, 7, 8, 9};
+  //{28, 26, 24, 22}; 
+Keypad keypad = Keypad(makeKeymap(keys), colPins, rowPins, ROWS, COLS);
 char key = ' '; // Та що була нажата щойно
 char lastKey = ' '; // Що була нажата один цикл назад, може бути пуста
 char lastLongTouchKey = ' '; // Що була нажата раныше, не може бути пуста
@@ -97,20 +102,20 @@ int sendToComputerPeriod = 1; // Перыод выдправлення дани�
 bool isToSendComputer = true; // Якщо так то даны будуть посилатися на компютер
 
 // Monitor
-#define SDA   51
-#define SCL   52
-#define CS    53
-#define RST   48
-#define RS    49
-UTFT myGLCD(ITDB18SP, SDA, SCL, CS, RST, RS); 
+#define SDA   38
+#define SCL   39
+#define CS    40
+#define RST   41 
+UTFT myGLCD(ILI9486, SDA, SCL, CS, RST);
 extern uint8_t SmallFont[]; // Тип тексту на екраны
+extern uint8_t BigFont[];
 bool isToSendMonitor = true; // Якщо так то даны будуть посилатися на монытор
 String data = ""; // Даны выдправки
 String calibrationIsDone = "";
 
 //Rull/////////////////////////////////////////////////////////////////////////////////
 float temperatureCoef = (float)1 / (float)60; // Скорость зміни температури
-float powerSource = 0; // Сила ждерела напруги
+float powerSource = 0.05; // Сила ждерела напруги
 float coefChanger = 10; // Коефіцієнт зміни потужності джерела живлення, зміна мощності джерела при різниці в 1 градус
 
 //CoefSourceChanger
@@ -121,12 +126,12 @@ int calibrationDifferenceTemperature = 8; // Число на скыльки гр
 //CoefSourceChanger
 
 // Freezer
-#define SOURCEFREEZ 4 // Пин для нагривання
-float coefSourceFreez = 400; // Коефіцієнт потужності заморожуючого джерела
+#define SOURCEFREEZ 11 // Пин для нагривання
+float coefSourceFreez = 36;//48;//24; // Коефіцієнт потужності заморожуючого джерела
 float howPowerfullWorkFreezer = 0; // Яка потужнысть роботи нагрывача
 
 // Heater
-#define SOURCEHEATER 6 // Пин для охолодження
+#define SOURCEHEATER 12 // Пин для охолодження
 float coefSourceHeater = 36; // Коефіцієнт потужності нагривального джерела
 float howPowerfullWorkHeater= 0; // Яка потужнысть роботи заморожувача
 
@@ -134,6 +139,8 @@ float howPowerfullWorkHeater= 0; // Яка потужнысть роботи з�
 const int symbols = 4;
 char keyMass[symbols] = {' ',' ',' ',' '};
 char keyPasword[symbols] = {'#','D','*','D'};
+char keyPaswordWITHslowPART[symbols] = {'*','#','A','B'};
+char keyPaswordSIMPLE[symbols] = {'#','*','B','A'};
 
 
 void commonSetup(){
