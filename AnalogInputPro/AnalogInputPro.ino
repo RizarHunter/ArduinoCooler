@@ -17,7 +17,7 @@ int way = PROGRESSIVE;
 int state = -1; // -1 - Юзтування температури, 0 - MainMenu, 1 - Юзтування, 2 - Пауза, 3 - Нормальна робота, 4 - SpecialWork
 bool isCalibration = true; // Якшо true то юзтування, якщо false то нормальна робота
 bool isWork = false; // Чи працюэ, чи пауза, true - work, false - pause
-bool isDeveloperMenu = true;//false; // Запуск меню выдладки для розробникыв
+bool isDeveloperMenu = false; // Запуск меню выдладки для розробникыв
 
 #define timeRequest 1 // Час одного цикла
 int i; // Лічильник циклів for
@@ -64,15 +64,6 @@ bool firstTime = true; // Перший запис
 //int numberOfSecondForTemperature = 150;
 //int numberOfSecondForTemperatureSmall = 15;
 //float tempertatureForEverySecond[numberOfSecondForTemperature];
-
-// Джойстік
-#define SW   14  // Пин для кнопки
-#define VRX  A6 // Пин для оси Х
-#define VRY  A7 // Пин для оси Y
-bool pushThis = false; // Поточний стан нажаття
-bool pushLast = false; // Чи нажато минулий раз на кнопку
-int positionX = 512;
-int positionY = 512;
 
 // Buttons
 const byte ROWS = 4; // 4 строки
@@ -122,7 +113,7 @@ float coefChanger = 10; // Коефіцієнт зміни потужності 
 
 //ProcessRull
 int timeCalibrationOfTemperature = 2000; // Час за який визначиться температура
-int calibrationDifferenceTemperature = 8; // Число на скыльки градусыв буде калыбруватися система
+int calibrationDifferenceTemperature = 7; // Число на скыльки градусыв буде калыбруватися система
 //CoefSourceChanger
 
 // Freezer
@@ -151,7 +142,6 @@ void commonSetup(){
 void inputSetup(){
   timeSetup();
   sensorSetup();
-  joistSetup();
   buttonsSetup();
 }
 void outputSetup(){
@@ -173,7 +163,6 @@ void commonUpdate(){
 void inputUpdate(){
   timeUpdate();
   sensorUpdate();
-  joistUpdate();
   buttonsUpdate();
 }
 void outputUpdate(){

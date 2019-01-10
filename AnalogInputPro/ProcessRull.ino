@@ -11,7 +11,7 @@ void processRullUpdate() {
         controlSourcePower();
         stateRelay();
       } break;
-    case 4: { 
+    case 4: {
         minusTemperature();
         controlSourcePower();
         } break; // Special Work, потрыбна температура зменшуэться, але джерело охолодження не корегуэться
@@ -23,13 +23,15 @@ void findFirstTemperature() {
   needTemperature = temperature;
   if (millisecondFromStartFullCalibration > timeCalibrationOfTemperature){
     stateWork();
+    //calibrateFreezer();
   }
 }
 
 void testTemperature() {
-  howPowerfullWorkFreezer = 500 * (1 - (1 / calibrationDifferenceTemperature) * (needTemperature - temperature));
+  howPowerfullWorkFreezer = 300 * (1 - (1 / calibrationDifferenceTemperature) * (needTemperature - temperature));
   if (abs(needTemperature - temperature) > calibrationDifferenceTemperature){
-    stateMainMenu();
+    //stateMainMenu();
+    stateWork();
     calibrationIsDone = "DONE";
   }
 }

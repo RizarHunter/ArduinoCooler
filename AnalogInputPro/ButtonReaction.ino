@@ -14,27 +14,6 @@ void buttonReactionUpdate() {
 }
 
 
-
-
-void joistReactiion() {
-  axisX();
-  axisY();
-  //button();
-}
-
-void axisX() {
-  speedTemperature += ((int)(positionX - 520) / (int)50) * 0.0005f;
-  if (speedTemperature < 0) speedTemperature = 0;
-}
-void axisY() {
-  targetTemperature -= ((int)(positionY - 520) / (int)50) * 0.075f;
-  if (targetTemperature < temperatureMin) targetTemperature = temperatureMin;
-  if (targetTemperature > temperatureMax) targetTemperature = temperatureMax;
-}
-void button() {}
-
-
-
 void changeDependenciesKeyUsual() {
   if (isPushedNewButton('1')) button1Usu();
   if (isPushedNewButton('2')) button2Usu();

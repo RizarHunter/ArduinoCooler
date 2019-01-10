@@ -8,6 +8,9 @@ void buttonsUpdate(){
 
 void getButtons(){
   key = keypad.getKey();
+  
+  if (Serial.available() > 0)
+    key = (char)(Serial.readString()[0]);
 }
 
 void lastButtonPushed(){
